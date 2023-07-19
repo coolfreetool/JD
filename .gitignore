@@ -1,0 +1,7 @@
+obj
+bin
+lib_x64
+lib_x86
+.vs
+*.db
+*.dll

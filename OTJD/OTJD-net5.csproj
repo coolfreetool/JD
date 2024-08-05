@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\JD.NET\JD.NET-net5.csproj">
+      <Project>{b570fe5a-a17b-403b-bee9-45a15ecf92cd}</Project>
+      <Name>JD.NET</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\JDUtils\JDUtils-net5.csproj">
+      <Project>{9eb10088-c898-4ae2-9f08-f79107bb9a21}</Project>
+      <Name>JDUtils</Name>
+    </ProjectReference>
+    <PackageReference Include="Google.OrTools" Version="9.5.2237" />
+  </ItemGroup>
+</Project>

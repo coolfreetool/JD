@@ -5,3 +5,4 @@ lib_x86
 .vs
 *.db
 *.dll
+.idea

@@ -133,7 +133,17 @@ namespace OTJD
 
         public void AddSOSConstr(SOSConstr sosCon)
         {
-            throw new JDException("SOS constraints unsupported in OTSolvers");
+            Variable[] sos1Vars = new Variable[sosCon.Vars.Count];
+            double[] sos1Weights = new double[sosCon.Vars.Count];
+            for(int i = 0; i < sosCon.Vars.Count; i++)
+            {
+                sos1Vars[i] = _otVars[sosCon.Vars[i].Id];
+                sos1Weights[i] = sosCon.Weights[i];
+            }
+            if (sosCon.Type == 1)
+                _solver.(sos1Vars, sos1Weights);
+            // if (sosCon.Type == 2)
+            //     _solver.MakeSOS2Constraint(sos1Vars, sos1Weights);
         }
 
         public void SetObjective(ScLinExpr obj, int sense)
@@ -203,5 +213,14 @@ namespace OTJD
         public CbcJDSolver()
             : base("CBC_MIXED_INTEGER_PROGRAMMING"){}
     }
-}
 
+    public class ScipJDSolver : OTJDSolver
+    {
+        internal override string name
+        {
+            get { return "SCIP"; }
+        }
+        public ScipJDSolver()
+            : base("SCIP"){}
+    }
+}

@@ -21,47 +21,47 @@ namespace JDSpace
             JDTester.ResetSolver();
         }
                 
-        // [Test]
-        // public void SimpleSOS1()
-        // {
-        //     JDModel mdl = new JDModel();
+        [Test]
+        public void SimpleSOS1()
+        {
+            JDModel mdl = new JDModel();
             
-        //     // var init.
-        //     JDVar x = mdl.AddVar(1, 3);
+            // var init.
+            JDVar x = mdl.AddVar(1, 3);
 
-        //     // const.
-        //     mdl += x <= 10;
-        //     mdl.AddSOS1(x, new double[] { 0, 1, 2 });
+            // const.
+            mdl += x <= 10;
+            mdl.AddSOS1(x, new double[] { 0, 1, 2 });
 
-        //     // solve
-        //     mdl.SetObjective(x, JD.MAXIMIZE);
-        //     JDTester._solver.Solve(mdl);
+            // solve
+            mdl.SetObjective(x, JD.MAXIMIZE);
+            JDTester._solver.Solve(mdl);
 
-        //     // check result
-        //     double[,] refer = { { 10, 0, 0 } };
-        //     AssertExtensions.AreEqual(refer, x.ToDoubleMat(), ALLOWED_DELTA);
-        // }
+            // check result
+            double[,] refer = { { 10, 0, 0 } };
+            AssertExtensions.AreEqual(refer, x.ToDoubleMat(), ALLOWED_DELTA);
+        }
 
-        // [Test]
-        // public void SimpleSOS2()
-        // {
-        //     JDModel mdl = new JDModel();
+        [Test]
+        public void SimpleSOS2()
+        {
+            JDModel mdl = new JDModel();
 
-        //     // var init.
-        //     JDVar x = mdl.AddVar(1, 4);
+            // var init.
+            JDVar x = mdl.AddVar(1, 4);
 
-        //     // const.
-        //     mdl += x <= 5;
-        //     mdl.AddSOS2(x, new double[] { 0, 1, 2, 3 });
+            // const.
+            mdl += x <= 5;
+            mdl.AddSOS2(x, new double[] { 0, 1, 2, 3 });
 
-        //     // solve
-        //     mdl.SetObjective(x, JD.MAXIMIZE);
-        //     JDTester._solver.Solve(mdl);
+            // solve
+            mdl.SetObjective(x, JD.MAXIMIZE);
+            JDTester._solver.Solve(mdl);
 
-        //     // check result
-        //     double[,] refer = { { 5, 5, 0, 0 } };
-        //     AssertExtensions.AreEqual(refer, x.ToDoubleMat(), ALLOWED_DELTA);
-        // }
+            // check result
+            double[,] refer = { { 5, 5, 0, 0 } };
+            AssertExtensions.AreEqual(refer, x.ToDoubleMat(), ALLOWED_DELTA);
+        }
 
         [Test]
         public void ExplicitSOS1Test1()

@@ -12,5 +12,5 @@ sudo apt-get install dotnet-sdk-5.0
 
 ## Run tests
 ~~~bash
-dotnet test -v n
+SOLVER=CBC dotnet test -v n JD-net5.sln # Run tests using CBC solver
 ~~~

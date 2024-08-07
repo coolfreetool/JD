@@ -203,5 +203,25 @@ namespace OTJD
         public CbcJDSolver()
             : base("CBC_MIXED_INTEGER_PROGRAMMING"){}
     }
+
+    public class ScipJDSolver : OTJDSolver
+    {
+        internal override string name
+        {
+            get { return "SCIP"; }
+        }
+        public ScipJDSolver()
+            : base("SCIP"){}
+    }
+
+    public class SatJDSolver : OTJDSolver
+    {
+        internal override string name
+        {
+            get { return "SAT"; }
+        }
+        public SatJDSolver()
+            : base("SAT"){}
+    }
 }
 

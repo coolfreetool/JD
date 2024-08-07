@@ -19,7 +19,24 @@ namespace JDSpace
         internal static IJDSolver _solver;
 
         public static void ResetSolver() {
-            _solver = new CbcJDSolver();
+            string solverVar = Environment.GetEnvironmentVariable("SOLVER");
+            switch (solverVar)
+            {
+                case "CBC":
+                    _solver = new CbcJDSolver(); // tested - it works
+                    break;
+                case "SCIP":
+                    _solver = new ScipJDSolver(); // tested - it works
+                    break;
+                case "Glpk":
+                    _solver = new GlpkJDSolver(); // doesn't work
+                    break;
+                case "SAT":
+                    _solver = new SatJDSolver(); // tested - it works partially
+                    break;
+                default:
+                    throw new JDException("Unknown solver {0}", solverVar);
+            }
         }
 
         /// <summary>

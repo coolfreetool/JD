@@ -18,5 +18,5 @@ jobs:
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
       # You can test your matrix by printing the current dotnet version
-      - name: Display dotnet version
-        run: dotnet test -v n JD-net5.sln
+      - name: Run tests
+        run: dotnet test -v n JD-net5.sln | ./.github/workflows/colorize.sh

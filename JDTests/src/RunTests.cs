@@ -36,7 +36,7 @@ namespace JDSpace
                     _solver = new SatJDSolver(); // tested - it works partially
                     break;
                 case "LpSolve":
-                    _solver = new LpJDSolver(); // tested - it works partially
+                    _solver = new LpJDSolver(); // not tested
                     break;
                 default:
                     throw new JDException("Unknown solver {0}", solverVar);

@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFrameworks>net5.0;net461</TargetFrameworks>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="LpSolveDotNet" Version="4.0.0" />
+    <ProjectReference Include="..\JD.NET\JD.NET.csproj">
+      <Project>{b570fe5a-a17b-403b-bee9-45a15ecf92cd}</Project>
+      <Name>JD.NET</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\JDUtils\JDUtils.csproj">
+      <Project>{9eb10088-c898-4ae2-9f08-f79107bb9a21}</Project>
+      <Name>JDUtils</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

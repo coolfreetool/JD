@@ -18,6 +18,8 @@ jobs:
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
       # You can test your matrix by printing the current dotnet version
+      - name: Run tests (LpSolve)
+        run: SOLVER=LpSolve dotnet test -v n JD-net5.sln | ./.github/workflows/colorize.sh
       - name: Run tests (CBC)
         run: SOLVER=CBC dotnet test -v n JD-net5.sln | ./.github/workflows/colorize.sh
       - name: Run tests (SCIP)

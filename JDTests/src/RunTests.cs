@@ -7,6 +7,7 @@ using System.Diagnostics;
 using JDUtils;
 using NUnitLite;
 using OTJD;
+using LpSolveJD;
 
 namespace JDSpace
 {
@@ -33,6 +34,9 @@ namespace JDSpace
                     break;
                 case "SAT":
                     _solver = new SatJDSolver(); // tested - it works partially
+                    break;
+                case "LpSolve":
+                    _solver = new LpJDSolver(); // tested - it works partially
                     break;
                 default:
                     throw new JDException("Unknown solver {0}", solverVar);

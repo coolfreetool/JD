@@ -134,20 +134,15 @@ namespace JDSpace
             _xSize = x2 - x1 + 1;
             _ySize = y2 - y1 + 1;
             _initGetMemberFunc();
-            int len = XSize * YSize;
-            //ScLinExpr[] subLinExprArray = new ScLinExpr[XSize * YSize];
-            LinExprs = new List<ScLinExpr>(len);
-            int ii = 0;
-            int idx = 0;
-            //Model = subLinExpr.Model;
-            for (int iy = y1; iy < (y2 + 1); iy++) // via column iteration
+            int capacity = XSize * YSize;
+            LinExprs = new List<ScLinExpr>(capacity);
+            int num = 0;
+            for (int i = x1; i < x2 + 1; i++)
             {
-                for (int ix = x1; ix < x2 + 1; ix++) // via row iteration
+                for (int j = y1; j < y2 + 1; j++)
                 {
-                    LinExprs[ii] = ScLinExprFactory.CreateScLinExpr(); // Model.AddScalarLinExpr();
-                    idx = ix * subLinExpr.YSize + iy;
-                    LinExprs[ii].Add(subLinExpr.LinExprs[idx]);
-                    ii++;
+                    num = i * subLinExpr.YSize + j;
+                    LinExprs.Add(subLinExpr.LinExprs[num]);
                 }
             }
         }

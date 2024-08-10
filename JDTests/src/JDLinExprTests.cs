@@ -178,5 +178,30 @@ namespace JDSpace
             }
             throw new Exception("Infeasible constant constraint uncatched!");
         }
+
+        /// <summary>
+        /// Get linear expr sub region.
+        /// </summary>
+        [Test]
+        public void SubLinExprTest1()
+        {
+            JDModel mdl = new JDModel();
+            JDVar a = mdl.AddVar(3, 5, 0, 100, JD.CONTINUOUS);
+            double[,] C = { { 1, 2, 3, 4,  5 },
+                            { 6, 7, 8, 9, 10 },
+                            { 11, 12, 13, 14, 15 } };
+            JDLinExpr e1 = a + C;
+
+            JDLinExpr e2 = e1[1, 2, 1, 3];
+            Assert.AreEqual(2, e2.XSize);
+            Assert.AreEqual(3, e2.YSize);
+
+            mdl.SetObjective(a.Sum(), JD.MAXIMIZE);
+            JDTester._solver.Solve(mdl);
+
+            double?[,] expE2 = { { 107, 108, 109 },
+                                { 112, 113, 114 } };
+            AssertExtensions.AreEqual(expE2, e2.ToDouble());
+        }
     }
 }

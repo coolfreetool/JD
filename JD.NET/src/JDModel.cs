@@ -497,7 +497,7 @@ namespace JDSpace
                 for (int i = 0; i < count; i++)
                 {
                     id = firstId + i;
-                    varName = String.Format("{0}{1}", name, i);
+                    varName = String.Format("{0}{1}", name, id);
                     varsList.Add(new ScVar(id, varName, type, lb, ub, braPri));
                 }
             }

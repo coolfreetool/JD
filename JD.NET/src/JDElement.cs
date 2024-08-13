@@ -32,7 +32,7 @@ namespace JDSpace
         /// <summary>
         /// Total count of elements (scalar linear expressions).
         /// </summary>
-        public int Numel { get { return XSize * YSize; } }        
+        public int Numel { get { return XSize * YSize; } }
 
         /// <summary>
         /// Multiple of this linear expression.
@@ -61,7 +61,7 @@ namespace JDSpace
         private static JDLinExpr multiplicateOneMatrixElement(JDElement comp, IList multiplier, int iRow, int iCol, Func<int, int, object> getXYmember)
         {
             JDLinExpr expr = comp.ToJDLinExpr();
-            JDLinExpr res = expr[iRow, 0].Multip(getXYmember(0,iCol));
+            JDLinExpr res = expr[iRow, 0].Multip(getXYmember(0, iCol));
             if (expr.YSize > 1)
             {
                 for (int i = 1; i < expr.YSize; i++)
@@ -102,11 +102,11 @@ namespace JDSpace
 
         /// <summary>
         /// Sum of two JD objects.
-        /// </summary>
+        /// </summary> 
         /// <param name="lhs">Left-hand side expression.</param>
         /// <param name="rhs">Right-hand side constant.</param>
         /// <returns>Result expression.</returns>
-        public static JDLinExpr operator +(JDElement lhs, object rhs)
+        private static JDLinExpr operatorPlus(JDElement lhs, object rhs)
         {
             JDLinExpr res;
             res = new JDLinExpr(lhs.XSize, lhs.YSize, lhs.ScLinExprFactory);
@@ -117,16 +117,119 @@ namespace JDSpace
 
         /// <summary>
         /// Sum of two JD objects.
+        /// </summary>
+        /// <param name="lhs">Left-hand side expression.</param>
+        /// <param name="rhs">Right-hand side constant.</param>
+        /// <returns>Result expression.</returns>
+        public static JDLinExpr operator +(JDElement lhs, object rhs)
+        {
+            return operatorPlus(lhs, rhs);
+        }
+
+        /// <summary>
+        /// Sum of two JD objects.
+        /// </summary>
+        /// <param name="lhs">Left-hand side expression.</param>
+        /// <param name="rhs">Right-hand side double constant.</param>
+        /// <returns>Result expression.</returns>
+        public static JDLinExpr operator +(JDElement lhs, double rhs)
+        {
+            return operatorPlus(lhs, rhs);
+        }
+
+        /// <summary>
+        /// Sum of two JD objects.
+        /// </summary>
+        /// <param name="lhs">Left-hand side expression.</param>
+        /// <param name="rhs">Right-hand side double[] constant.</param>
+        /// <returns>Result expression.</returns>
+        public static JDLinExpr operator +(JDElement lhs, double[] rhs)
+        {
+            return operatorPlus(lhs, rhs);
+        }
+
+        /// <summary>
+        /// Sum of two JD objects.
+        /// </summary>
+        /// <param name="lhs">Left-hand side expression.</param>
+        /// <param name="rhs">Right-hand side constant.</param>
+        /// <returns>Result expression.</returns>
+        public static JDLinExpr operator +(JDElement lhs, double[][] rhs)
+        {
+            return operatorPlus(lhs, rhs);
+        }
+
+        /// <summary>
+        /// Sum of two JD objects.
         /// </summary> 
         /// <param name="lhs">Left-hand side constant.</param>
         /// <param name="rhs">Right-hand side expression.</param>
         /// <returns>Result expression.</returns>
         public static JDLinExpr operator +(object lhs, JDElement rhs)
         {
-            return rhs + lhs;
+            return operatorPlus(rhs, lhs);
+        }
+
+        /// <summary>
+        /// Sum of two JD objects.
+        /// </summary> 
+        /// <param name="lhs">Left-hand side double constant.</param>
+        /// <param name="rhs">Right-hand side expression.</param>
+        /// <returns>Result expression.</returns>
+        public static JDLinExpr operator +(double lhs, JDElement rhs)
+        {
+            return operatorPlus(rhs, lhs);
+        }
+
+        /// <summary>
+        /// Sum of two JD objects.
+        /// </summary> 
+        /// <param name="lhs">Left-hand side double[] constant.</param>
+        /// <param name="rhs">Right-hand side expression.</param>
+        /// <returns>Result expression.</returns>
+        public static JDLinExpr operator +(double[] lhs, JDElement rhs)
+        {
+            return operatorPlus(rhs, lhs);
+        }
+
+        /// <summary>
+        /// Sum of two JD objects.
+        /// </summary> 
+        /// <param name="lhs">Left-hand side double[][] constant.</param>
+        /// <param name="rhs">Right-hand side expression.</param>
+        /// <returns>Result expression.</returns>
+        public static JDLinExpr operator +(double[][] lhs, JDElement rhs)
+        {
+            return operatorPlus(rhs, lhs);
         }
         #endregion << + OPERATOR OVERLOAD >>
         #region << - OPERATOR OVERLOAD >>
+        /// <summary>
+        /// Difference of two JD objects.
+        /// </summary>
+        /// <param name="lhs">Left-hand side expression.</param>
+        /// <param name="rhs">Right-hand side constant.</param>
+        /// <returns>Result expression.</returns>
+        private static JDLinExpr operatorMinus(JDElement lhs, object rhs)
+        {
+            JDLinExpr jDLinExpr = lhs.Multip(-1);
+            jDLinExpr.Add(rhs);
+            return jDLinExpr.Multip(-1);
+        }
+
+        /// <summary>
+        /// Difference of two JD objects.
+        /// </summary>
+        /// <param name="lhs">Left-hand side constant.</param>
+        /// <param name="rhs">Right-hand side expression.</param>
+        /// <returns>Result expression.</returns>
+        private static JDLinExpr operatorMinus(object lhs, JDElement rhs)
+        {
+            JDLinExpr jDLinExpr = rhs.Multip(-1);
+            jDLinExpr.Add(lhs);
+            return jDLinExpr;
+        }
+
         /// <summary>
         /// Difference of two JD linear expressions.
         /// </summary>
@@ -148,12 +251,40 @@ namespace JDSpace
         /// <returns>Result expression.</returns>
         public static JDLinExpr operator -(JDElement lhs, object rhs)
         {
-            JDLinExpr negLhs = lhs.Multip(-1);
-            negLhs.Add(rhs);
-            negLhs = negLhs.Multip(-1);
-            return negLhs;
+            return operatorMinus(lhs, rhs);
+        }
+        /// <summary>
+        /// Difference of two JD objects.
+        /// </summary>
+        /// <param name="lhs">Left-hand side expression.</param>
+        /// <param name="rhs">Right-hand side double constant.</param>
+        /// <returns>Result expression.</returns>
+        public static JDLinExpr operator -(JDElement lhs, double rhs)
+        {
+            return operatorMinus(lhs, rhs);
         }
 
+        /// <summary>
+        /// Difference of two JD objects.
+        /// </summary>
+        /// <param name="lhs">Left-hand side expression.</param>
+        /// <param name="rhs">Right-hand side double[] constant.</param>
+        /// <returns>Result expression.</returns>
+        public static JDLinExpr operator -(JDElement lhs, double[] rhs)
+        {
+            return operatorMinus(lhs, rhs);
+        }
+
+        /// <summary>
+        /// Difference of two JD objects.
+        /// </summary>
+        /// <param name="lhs">Left-hand side expression.</param>
+        /// <param name="rhs">Right-hand side double[][] constant.</param>
+        /// <returns>Result expression.</returns>
+        public static JDLinExpr operator -(JDElement lhs, double[][] rhs)
+        {
+            return operatorMinus(lhs, rhs);
+        }
         /// <summary>
         /// Difference of two JD objects.
         /// </summary>
@@ -162,11 +293,40 @@ namespace JDSpace
         /// <returns>Result expression.</returns>
         public static JDLinExpr operator -(object lhs, JDElement rhs)
         {
-            JDLinExpr rhs2 = rhs.Multip(-1);
-            rhs2.Add(lhs);
-            return rhs2;
+            return operatorMinus(lhs, rhs);
         }
-        
+        /// <summary>
+        /// Difference of two JD objects.
+        /// </summary>
+        /// <param name="lhs">Left-hand side double constant.</param>
+        /// <param name="rhs">Right-hand side expression.</param>
+        /// <returns>Result expression.</returns>
+        public static JDLinExpr operator -(double lhs, JDElement rhs)
+        {
+            return operatorMinus(lhs, rhs);
+        }
+
+        /// <summary>
+        /// Difference of two JD objects.
+        /// </summary>
+        /// <param name="lhs">Left-hand side double[] constant.</param>
+        /// <param name="rhs">Right-hand side expression.</param>
+        /// <returns>Result expression.</returns>
+        public static JDLinExpr operator -(double[] lhs, JDElement rhs)
+        {
+            return operatorMinus(lhs, rhs);
+        }
+
+        /// <summary>
+        /// Difference of two JD objects.
+        /// </summary>
+        /// <param name="lhs">Left-hand side double[][] constant.</param>
+        /// <param name="rhs">Right-hand side expression.</param>
+        /// <returns>Result expression.</returns>
+        public static JDLinExpr operator -(double[][] lhs, JDElement rhs)
+        {
+            return operatorMinus(lhs, rhs);
+        }
         #endregion << - OPERATOR OVERLOAD >>
         #region << * OPERATOR OVERLOAD >>
         /// <summary>
@@ -176,7 +336,18 @@ namespace JDSpace
         /// <param name="rhs">Right-hand side constant.</param>
         /// <returns>Result expression.</returns>
         public static JDLinExpr operator *(JDElement lhs, object rhs)
-        {   
+        {
+            return lhs.Multip(rhs);
+        }
+
+        /// <summary>
+        /// Product of two JD objects.
+        /// </summary>
+        /// <param name="lhs">Left-hand side expression.</param>
+        /// <param name="rhs">Right-hand side constant.</param>
+        /// <returns>Result expression.</returns>
+        public static JDLinExpr operator *(JDElement lhs, double rhs)
+        {
             return lhs.Multip(rhs);
         }
 
@@ -187,6 +358,17 @@ namespace JDSpace
         /// <param name="rhs">Right-hand side constant.</param>
         /// <returns>Result expression.</returns>
         public static JDLinExpr operator *(object lhs, JDElement rhs)
+        {
+            return rhs.Multip(lhs);
+        }
+
+        /// <summary>
+        /// Product of two JD objects.
+        /// </summary>
+        /// <param name="lhs">Left-hand side expression.</param>
+        /// <param name="rhs">Right-hand side constant.</param>
+        /// <returns>Result expression.</returns>
+        public static JDLinExpr operator *(double lhs, JDElement rhs)
         {
             return rhs.Multip(lhs);
         }
@@ -233,10 +415,11 @@ namespace JDSpace
             }
             else
             {
-                if (comp.YSize == multiplier.Count) {
+                if (comp.YSize == multiplier.Count)
+                {
                     xSize = multiplier.Count;
                     ySize = 1;
-                    return multiplier.GetSimpleListColumnVectorXYMember; 
+                    return multiplier.GetSimpleListColumnVectorXYMember;
                 }
                 if (comp.XSize == multiplier.Count)
                 {

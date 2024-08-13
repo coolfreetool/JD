@@ -6,6 +6,7 @@ using JDSpace;
 using JDUtils;
 using System.Threading.Tasks;
 using System.Collections;
+using System.Diagnostics.Contracts;
 
 namespace JDSpace
 {
@@ -13,13 +14,13 @@ namespace JDSpace
     /// JD linear expression class represents two-dimensional matrix
     /// of scalar linear expressions.
     /// </summary>
-    public class JDLinExpr : JDElement 
+    public class JDLinExpr : JDElement
     {
         private int _xSize;
         /// <summary>
         /// Get first dimension object size.
         /// </summary>
-        public override int XSize { get { return _xSize;} }
+        public override int XSize { get { return _xSize; } }
 
         private int _ySize;
         /// <summary>
@@ -43,7 +44,7 @@ namespace JDSpace
         /// <param name="y1">Second dimension start coordinate</param>
         /// <param name="y2">Second dimension end coordinate</param>
         /// <returns>Scalar linear expression.</returns>
-        public JDLinExpr this[int x1, int x2, int y1, int y2] 
+        public JDLinExpr this[int x1, int x2, int y1, int y2]
         { get { return this.Get(x1, x2, y1, y2); } }
 
         /// <summary>
@@ -55,7 +56,7 @@ namespace JDSpace
 
         internal JDLinExpr(ScLinExprFactory scLinExprFactory)
         {
-            if(scLinExprFactory == null){ ScLinExprFactory = new ScLinExprFactory(composed: false);}
+            if (scLinExprFactory == null) { ScLinExprFactory = new ScLinExprFactory(composed: false); }
             else
             {
                 ScLinExprFactory = scLinExprFactory;
@@ -73,7 +74,8 @@ namespace JDSpace
         internal JDLinExpr(List<ScLinExpr> linExprs, int xSize, int ySize, ScLinExprFactory scLinExprFactory)
             : this(scLinExprFactory)
         {
-            if (linExprs.Count != xSize * ySize){
+            if (linExprs.Count != xSize * ySize)
+            {
                 throw new JDException("VarList lenght and xSize * ySize is different");
             }
             _xSize = xSize;
@@ -265,7 +267,7 @@ namespace JDSpace
             constant.GetSize(out xSize, out ySize);
             if (constant.Is2D())
             {
-                _add2DList(constant, xSize, ySize);                
+                _add2DList(constant, xSize, ySize);
             }
             else
             {
@@ -280,7 +282,7 @@ namespace JDSpace
         /// <param name="xSize">First coordinate where the constants are added</param>
         /// <param name="ySize">Second coordinate where the constants are added</param>
         private void _add2DList(IList constants, int xSize, int ySize)
-        {            
+        {
             if ((xSize == this.XSize) && (ySize == this.YSize))
             {
                 Func<int, int, object> getXYmember = constants.InitXYGetter();
@@ -430,18 +432,55 @@ namespace JDSpace
         /// optimization. 
         /// </summary>
         /// <returns>Variable value.</returns>
-        public double?[][] ToDoubleArrs()
+        public double?[][] ToDoubleArrays()
         {
-            double?[][] arr = new double?[XSize][];
-            for (int xi = 0; xi < this.XSize; xi++)
+            double?[][] array = new double?[XSize][];
+            for (int i = 0; i < XSize; i++)
             {
-                arr[xi] = new double?[YSize];
-                for (int yi = 0; yi < YSize; yi++)
+                array[i] = new double?[YSize];
+                for (int j = 0; j < YSize; j++)
                 {
-                    arr[xi][yi] = ToDouble(xi, yi);
+                    ref double? reference = ref array[i][j];
+                    reference = ToDouble(i, j);
                 }
             }
-            return arr;
+            return array;
+        }
+
+        /// <summary>
+        /// Returns solved value of a member at x dimension from
+        /// most recent optimization.
+        /// </summary>
+        /// <param name="xIndex">Dimension required member coordinate.</param>
+        /// <returns>Scalar lin. expr. value.</returns>
+        public double?[] ToDoubleArrayX(int xIndex)
+        {
+            double?[] array = new double?[YSize];
+            for (int i = 0; i < YSize; i++)
+            {
+                ref double? reference = ref array[i];
+                reference = ToDouble(xIndex, i);
+            }
+
+            return array;
+        }
+
+        /// <summary>
+        /// Returns solved value of a member at y dimension from
+        /// most recent optimization.
+        /// </summary>
+        /// <param name="yIndex">Dimension required member coordinate.</param>
+        /// <returns>Scalar lin. expr. value.</returns>
+        public double?[] ToDoubleArrayY(int yIndex)
+        {
+            double?[] array = new double?[XSize];
+            for (int i = 0; i < XSize; i++)
+            {
+                ref double? reference = ref array[i];
+                reference = ToDouble(i, yIndex);
+            }
+
+            return array;
         }
 
         /// <summary>
@@ -492,8 +531,160 @@ namespace JDSpace
         {
             return _getMember(i);
         }
-    }
 
+        /// <summary>
+        /// Multiply expesions element wise.
+        /// </summary>
+        /// <param name="coefficients">Array with constants.</param>
+        /// <returns>New multiplied result linear expression.</returns>
+        public JDLinExpr DotMultiply(double[] coefficients)
+        {
+            return DotMultiply(new double[1][] { coefficients });
+        }
+
+        /// <summary>
+        /// Multiply expesions element wise.
+        /// </summary>
+        /// <param name="coefficients">Array with constants.</param>
+        /// <returns>New multiplied result linear expression.</returns>
+        public JDLinExpr DotMultiply(double[][] coefficients)
+        {
+            if (coefficients.Any((double[] x) => x == null) || coefficients.Length == 0 || coefficients.Any((double[] x) => x.Length != coefficients[0].Length))
+            {
+                throw new JDException("Dimensions doesn't match, some collums are null or collumn lenght doesn't match.");
+            }
+
+            JDLinExpr jDLinExpr;
+            ScLinExpr[][] array2;
+            if (coefficients.Length == XSize && coefficients[0].Length == YSize)
+            {
+                jDLinExpr = new JDLinExpr(XSize, YSize, base.ScLinExprFactory);
+                double[][] array = coefficients;
+                array2 = AsArray();
+            }
+            else if (coefficients.Length == 1 && coefficients[0].Length == 1)
+            {
+                jDLinExpr = new JDLinExpr(XSize, YSize, base.ScLinExprFactory);
+                double[][] array = new double[XSize][];
+                array2 = AsArray();
+                for (int i = 0; i < XSize; i++)
+                {
+                    array[i] = new double[YSize];
+                    for (int j = 0; j < YSize; j++)
+                    {
+                        array[i][j] = coefficients[0][0];
+                    }
+                }
+            }
+            else
+            {
+                if (XSize != 1 || YSize != 1)
+                {
+                    throw new JDException($"Dimensions doesn't match");
+                }
+
+                jDLinExpr = new JDLinExpr(coefficients.Length, coefficients[0].Length, base.ScLinExprFactory);
+                double[][] array = coefficients;
+                array2 = new ScLinExpr[coefficients.Length][];
+                for (int i = 0; i < coefficients.Length; i++)
+                {
+                    array2[i] = new ScLinExpr[coefficients[0].Length];
+                    for (int j = 0; j < coefficients[0].Length; j++)
+                    {
+                        array2[i][j] = LinExprs[0];
+                    }
+                }
+            }
+            for (int i = 0; i < jDLinExpr.XSize; i++)
+            {
+                for (int j = 0; j < jDLinExpr.YSize; j++)
+                {
+                    int index = i * YSize + j;
+                    jDLinExpr.LinExprs[index].Add(array2[i][j].Constant.ToDouble() * coefficients[i][j]);
+                    foreach (ScTerm term in array2[i][j].Terms)
+                    {
+                        jDLinExpr.LinExprs[index].AddTerm(term.Coeff.ToDouble() * coefficients[i][j], term.Var);
+                    }
+                }
+            }
+
+            return jDLinExpr;
+        }
+
+        /// <summary>
+        /// Convert LinExprs to array
+        /// </summary>
+        public ScLinExpr[][] AsArray()
+        {
+            ScLinExpr[][] array = new ScLinExpr[XSize][];
+            for (int i = 0; i < XSize; i++)
+            {
+                array[i] = new ScLinExpr[YSize];
+                for (int j = 0; j < YSize; j++)
+                {
+                    Contract.Assert(this[i, j].LinExprs.Count == 1);
+                    array[i][j] = this[i, j].LinExprs[0];
+                }
+            }
+            return array;
+        }
+
+        /// <summary>
+        /// Product by elements of constant and JD optimization variable. 
+        /// When it's multidimensional JDVar then via rows multiplication is performed!
+        /// |a b c| |3*a 3*b 3*c| |d e f|.Term([3 4]) = |4*d 4*e 4*f|
+        /// </summary>
+        /// <param name="coeff">Coefficients array.</param>
+        /// <returns>New multidimensional linear expression.</returns>
+        public JDLinExpr TermY(IList coeff)
+        {
+            if (YSize == coeff.Count)
+            {
+                JDLinExpr jDLinExpr = new JDLinExpr(XSize, YSize, base.ScLinExprFactory);
+                for (int i = 0; i < XSize; i++)
+                {
+                    for (int j = 0; j < YSize; j++)
+                    {
+                        jDLinExpr.LinExprs[i + j * XSize].Add(LinExprs[i + j * XSize].Constant.ToDouble() * coeff[j].ToDouble());
+                        foreach (ScTerm term in LinExprs[i + j * XSize].Terms)
+                        {
+                            jDLinExpr.LinExprs[i + j * XSize].AddTerm(term.Coeff.ToDouble() * coeff[j].ToDouble(), term.Var);
+                        }
+                    }
+                }
+
+                return jDLinExpr;
+            }
+
+            throw new Exception($"YSize ({YSize}) of scalar variables disagrees with coefficient array length ({coeff.Count})");
+        }
+
+        /// <summary>
+        /// Product by elements of constant and JD optimization variable. 
+        /// When it's multidimensional JDVar then via rows multiplication is performed!
+        /// |a b| |1*a 2*b| |c d|.Term([1 2 3 4]) = |3*c 4*d|
+        /// </summary>
+        /// <param name="coeff">Coefficients array.</param>
+        /// <returns>New multidimensional linear expression.</returns>
+        public JDLinExpr Term(IList coeff)
+        {
+            if (base.Numel == coeff.Count)
+            {
+                JDLinExpr jDLinExpr = new JDLinExpr(XSize, YSize, base.ScLinExprFactory);
+                for (int i = 0; i < coeff.Count; i++)
+                {
+                    jDLinExpr.LinExprs[i].Add(LinExprs[i].Constant.ToDouble() * coeff[i].ToDouble());
+                    foreach (ScTerm term in LinExprs[i].Terms)
+                    {
+                        jDLinExpr.LinExprs[i].AddTerm(term.Coeff.ToDouble() * coeff[i].ToDouble(), term.Var);
+                    }
+                }
+                return jDLinExpr;
+            }
+
+            throw new Exception($"Numel ({base.Numel}) of scalar variables disagrees with coefficient array length ({coeff.Count})");
+        }
+    }
     internal static class JDLinExprDoubleExtender
     {
         /// <summary>

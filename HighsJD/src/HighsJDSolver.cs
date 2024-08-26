@@ -6,6 +6,9 @@ namespace HighsJD {
 
     public class HighsJDSolver : IJDSolver
     {
+        public bool SupportsSOS1 => false;
+        public bool SupportsSOS2 => false;
+
         public HighsJDSolver() {
             
         }
@@ -132,6 +135,10 @@ namespace HighsJD {
         public double? GetVarValue(int id)
         {
             // return _otVars[id].SolutionValue();
+            throw new NotImplementedException();
+        }
+
+        public bool Export(string filenameWithoutExtension, string fileType) {
             throw new NotImplementedException();
         }
     }

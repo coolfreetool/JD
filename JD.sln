@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LpSolveJD", "LpSolveJD\LpSo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JDCli", "JDCli\JDCli.csproj", "{8B6F1420-28FF-48F9-AC6D-04F45D13EE2B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HighsJD", "HighsJD\HighsJD.csproj", "{D97DDEF6-7511-486B-B2B7-73B05E95E32B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -97,6 +99,18 @@ Global
 		{8B6F1420-28FF-48F9-AC6D-04F45D13EE2B}.Release|x64.Build.0 = Release|Any CPU
 		{8B6F1420-28FF-48F9-AC6D-04F45D13EE2B}.Release|x86.ActiveCfg = Release|Any CPU
 		{8B6F1420-28FF-48F9-AC6D-04F45D13EE2B}.Release|x86.Build.0 = Release|Any CPU
+		{D97DDEF6-7511-486B-B2B7-73B05E95E32B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D97DDEF6-7511-486B-B2B7-73B05E95E32B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D97DDEF6-7511-486B-B2B7-73B05E95E32B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D97DDEF6-7511-486B-B2B7-73B05E95E32B}.Debug|x64.Build.0 = Debug|Any CPU
+		{D97DDEF6-7511-486B-B2B7-73B05E95E32B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D97DDEF6-7511-486B-B2B7-73B05E95E32B}.Debug|x86.Build.0 = Debug|Any CPU
+		{D97DDEF6-7511-486B-B2B7-73B05E95E32B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D97DDEF6-7511-486B-B2B7-73B05E95E32B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D97DDEF6-7511-486B-B2B7-73B05E95E32B}.Release|x64.ActiveCfg = Release|Any CPU
+		{D97DDEF6-7511-486B-B2B7-73B05E95E32B}.Release|x64.Build.0 = Release|Any CPU
+		{D97DDEF6-7511-486B-B2B7-73B05E95E32B}.Release|x86.ActiveCfg = Release|Any CPU
+		{D97DDEF6-7511-486B-B2B7-73B05E95E32B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -10,9 +10,12 @@ rm packages-microsoft-prod.deb
 sudo apt-get install dotnet-sdk-5.0
 ~~~
 
-## Run tests
+## Run all tests
 ~~~bash
-SOLVER=CBC dotnet test -v n JD-net5.sln # Run tests using CBC solver
+SOLVER=CBC dotnet test -v n JD-net5.sln
+~~~
 
-SOLVER=CBC dotnet test JD-net5.sln --filter SubLinExprTest1 -v m # Run a single test
+## Run a single test
+~~~bash
+SOLVER=SCIP dotnet test JD-net5.sln --filter ExplicitSOS1and2Test2 -v n
 ~~~

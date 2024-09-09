@@ -159,6 +159,17 @@ namespace OTJD
 
         public void Optimize(JDParams pars)
         {
+            if (pars.IsSet(JD.IntParam.OUT_FLAG))
+            {
+                if (pars.Get<int>(JD.IntParam.OUT_FLAG) > 0)
+                {
+                    _solver.EnableOutput();
+                }
+                else
+                {
+                    _solver.SuppressOutput();
+                }
+            }
             Stopwatch sw = new Stopwatch();
             sw.Start();
             Solver.ResultStatus gStatus = _solver.Solve();

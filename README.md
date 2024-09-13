@@ -19,3 +19,8 @@ SOLVER=CBC dotnet test -v n JD-net5.sln
 ~~~bash
 SOLVER=SCIP dotnet test JD-net5.sln --filter ExplicitSOS1and2Test2 -v n
 ~~~
+
+## Run LogTests
+~~~bash
+SOLVER=SCIP dotnet test JD-net5.sln --filter LogTests -v m
+~~~

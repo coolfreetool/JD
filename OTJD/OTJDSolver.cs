@@ -21,6 +21,9 @@ namespace OTJD
 
         internal OTJDSolver(string solverType)
         {
+            Console.WriteLine("SOLVER CREATED");
+            CustomLogger cl = new CustomLogger();
+            Console.SetError(cl);
             _solver = Solver.CreateSolver(solverType);
             if (_solver == null)
             {
@@ -163,6 +166,8 @@ namespace OTJD
             {
                 if (pars.Get<int>(JD.IntParam.OUT_FLAG) > 0)
                 {
+                    _solver.SetSolverSpecificParametersAsString("display/verblevel = 5");
+                    _solver.SetSolverSpecificParametersAsString("display/lpinfo = TRUE");
                     _solver.EnableOutput();
                 }
                 else

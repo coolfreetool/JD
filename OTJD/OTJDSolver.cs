@@ -29,6 +29,7 @@ namespace OTJD
             {
                 throw new JDException("Can not create {0}", solverType);
             }
+            Console.ReadKey(); // ... test logs print order, "SOLVER CREATED" should be written, but it's not
             _solverType = solverType;
             _objective = _solver.Objective();
             _otVars = new Dictionary<int, Variable>();

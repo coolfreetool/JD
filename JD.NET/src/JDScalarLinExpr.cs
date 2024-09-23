@@ -40,6 +40,11 @@ namespace JDSpace
         /// </summary>
         public double Ub;
 
+        /// <summary>
+        /// Defines if variable is used in optimization.
+        /// </summary>
+        public bool Use = true;
+        
         private byte _branchPriority;
 
         /// <summary>
@@ -863,15 +868,12 @@ namespace JDSpace
                 double dResult = Constant;
                 foreach (ScTerm rVaC in Terms)
                 {
-                    try
-                    {
-                        dResult += rVaC.Coeff * (double)rVaC.Var.Value;
-                    }
-                    catch
+                    if (!rVaC.Var.Value.HasValue)
                     {
                         Console.WriteLine("No result value for variable {0}.", rVaC.Var.Id);
                         return null;
                     }
+                    dResult += rVaC.Coeff * rVaC.Var.Value.Value;
                 }
                 return dResult;
             }

@@ -4,13 +4,11 @@ using JDUtils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 
 namespace OTJD
 {
-    public abstract class OTJDSolver : IJDSolver
+    public abstract class OTJDSolver : IJDSolver, IDisposable
     {
         internal abstract string name { get; }
         private Solver _solver;
@@ -18,17 +16,29 @@ namespace OTJD
         private Dictionary<int, Variable> _otVars;
         private Logger _logger;
         private string _solverType;
-
+        public bool SupportsSOS1 => false;
+        public bool SupportsSOS2 => false;
         internal OTJDSolver(string solverType)
         {
-            _solver = Solver.CreateSolver(solverType);
+            _solverType = solverType;
+            init();
+        }
+
+        private void init()
+        {
+            _solver = Solver.CreateSolver(_solverType);
             if (_solver == null)
             {
-                throw new JDException("Can not create {0}", solverType);
+                throw new JDException("Can not create {0}", _solverType);
             }
-            _solverType = solverType;
             _objective = _solver.Objective();
             _otVars = new Dictionary<int, Variable>();
+            _solver.EnableOutput();
+        }
+        private void reset()
+        {
+            _objective.Clear();
+            _otVars.Clear();
         }
 
         public void AddScVar(ScVar scVar)
@@ -70,16 +80,15 @@ namespace OTJD
 
         public void Reset()
         {
-            //_solver.Reset();
-            _solver.Clear();
-            _otVars.Clear();
+            reset();
+            init();
         }
 
         public void AddConstr(ScConstr con)
         {
             Constraint otCon;
             double otRhs = -con.Lhs.Constant;
-            switch(con.Sense)
+            switch (con.Sense)
             {
                 case JD.LESS_EQUAL:
                     otCon = _solver.MakeConstraint(double.NegativeInfinity, otRhs);
@@ -172,7 +181,14 @@ namespace OTJD
             }
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            Solver.ResultStatus gStatus = _solver.Solve();
+            
+            ConfigureSolver(pars);
+            MPSolverParameters solverParams = new MPSolverParameters();
+            if (pars.IsSet("MIP_GAP"))
+            {
+                solverParams.SetDoubleParam(MPSolverParameters.DoubleParam.RELATIVE_MIP_GAP, pars.Get<double>("MIP_GAP"));
+            }
+            Solver.ResultStatus gStatus = _solver.Solve(solverParams);
             sw.Stop();
             pars.Set(JD.StringParam.SOLVER_NAME, name);
             int jdStatus = 0;
@@ -193,16 +209,76 @@ namespace OTJD
         {
             return _otVars[id].SolutionValue();
         }
+
+        public void ConfigureSolver(JDParams pars)
+        {
+            if (pars.IsSet("TIME_LIMIT"))
+            {
+                _solver.SetTimeLimit((int)pars.Get<double>("TIME_LIMIT") * 1000);
+            }
+        }
+
+        /// <summary>
+        /// Export model to file
+        /// </summary>
+        /// <param name="filenameWithoutExtension">File name without extension</param>
+        /// <param name="fileType">File type (mps, lp)</param>
+        /// <returns>true if succeeded, false otherwise.</returns>    
+        public bool Export(string filenameWithoutExtension, string fileType)
+        {
+            string text = null;
+            if (fileType == JD.LP)
+            {
+                text = _solver.ExportModelAsLpFormat(false);
+            }
+            else
+            {
+                if (!(fileType == JD.MPS))
+                {
+                    throw new JDException("Unknown file type {0}", fileType);
+                }
+
+                text = _solver.ExportModelAsMpsFormat(true, false);
+            }
+
+            if (string.IsNullOrEmpty(text))
+            {
+                return false;
+            }
+
+            FileInfo fileInfo = new FileInfo($"{filenameWithoutExtension}.{fileType}");
+            if (fileInfo.Exists && fileInfo.IsReadOnly)
+            {
+                return false;
+            }
+
+            using (StreamWriter streamWriter = new StreamWriter(fileInfo.FullName))
+            {
+                streamWriter.Write(text);
+            }
+
+            return true;
+        }
+
+        public void Dispose()
+        {
+            reset();
+        }
+
+        public void Interrupt()
+        {
+            _solver.InterruptSolve();
+        }
     }
 
-    public class GlpkJDSolver : OTJDSolver 
+    public class GlpkJDSolver : OTJDSolver
     {
         internal override string name
         {
             get { return "GLPK"; }
         }
         public GlpkJDSolver()
-            : base("GLPK_MIXED_INTEGER_PROGRAMMING"){}
+            : base("GLPK_MIXED_INTEGER_PROGRAMMING") { }
     }
 
     public class CbcJDSolver : OTJDSolver
@@ -212,7 +288,7 @@ namespace OTJD
             get { return "CBC"; }
         }
         public CbcJDSolver()
-            : base("CBC_MIXED_INTEGER_PROGRAMMING"){}
+            : base("CBC_MIXED_INTEGER_PROGRAMMING") { }
     }
 
     public class ScipJDSolver : OTJDSolver
@@ -222,9 +298,8 @@ namespace OTJD
             get { return "SCIP"; }
         }
         public ScipJDSolver()
-            : base("SCIP"){}
+            : base("SCIP") { }
     }
-
     public class SatJDSolver : OTJDSolver
     {
         internal override string name
@@ -232,7 +307,7 @@ namespace OTJD
             get { return "SAT"; }
         }
         public SatJDSolver()
-            : base("SAT"){}
+            : base("SAT") { }
     }
 }
 

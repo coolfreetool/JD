@@ -60,6 +60,17 @@ namespace JDSpace
         /// JD minimize int.
         /// </summary>
         public const int MINIMIZE = -1;
+
+        /// <summary>
+        /// JD *.mps file type string.
+        /// </summary>
+        public const string MPS = "mps";
+
+
+        /// <summary>
+        /// JD *.lp file type string.
+        /// </summary>
+        public const string LP = "lp";
         #endregion
 
         #region << LOG MESSAGES >>

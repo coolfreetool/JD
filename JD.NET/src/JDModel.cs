@@ -253,6 +253,7 @@ namespace JDSpace
             UseExplicitSOS = useExplicitSOS;
             _nextVarId = firstVarId;
             _nextConstrId = firstConstrId;
+            Name = name;
             if (name == null) Name = id.ToString();
             IsDataLoadable = dataLoadable;
             ScLinExprFactory = new ScLinExprFactory(IsDataLoadable);
@@ -607,7 +608,7 @@ namespace JDSpace
         /// <param name="obj">New model objective.</param>
         /// <param name="sense">New optimization sense (JD.MINIMIZE for minimization, JD.MAXIMIZE for maximization).</param>
         public void SetObjective(JDLinExpr obj, int sense)
-        {            
+        {
             SetObjective(obj.Sum().LinExprs[0], sense);
         }
 
@@ -632,7 +633,88 @@ namespace JDSpace
             SOSConstraints.Clear();
         }
 
-        
+        #region << SUMS >>
+        /// <summary>
+        /// Sum of variables in argument array via specific dimension.
+        /// </summary>
+        /// <param name="varArr">Array of variables to be sum.</param>
+        /// <param name="dim">Dimension index {0, 1}. 0 - sum via columns. 1 - sum via rows.</param>
+        /// <returns>Result sum of variables.</returns>
+        public JDLinExpr Sum(JDVar[] varArr, int dim)
+        {
+            JDElement jDElement;
+            switch (dim)
+            {
+                case 0:
+                    {
+                        jDElement = new JDLinExpr(1, varArr[0].YSize, varArr[0].ScLinExprFactory);
+                        break;
+                    }
+                case 1:
+                    {
+                        jDElement = new JDLinExpr(varArr[0].XSize, 1, varArr[0].ScLinExprFactory);
+                        break;
+                    }
+                default:
+                    {
+                        throw new EntryPointNotFoundException($"Error: Bad dimension selected: {dim}");
+                    }
+            }
+            for (int i = 0; i < varArr.Length; i++)
+            {
+                jDElement += (JDElement)varArr[i].Sum(dim);
+            }
+            return jDElement.ToJDLinExpr();
+        }
+
+        /// <summary>
+        /// Sum of variables in argument array.
+        /// </summary>
+        /// <param name="varArr">Array of variables to be sum.</param>
+        /// <returns>Result sum of variables in array.</returns>
+        public JDLinExpr Sum(JDVar[] varArr)
+        {
+            JDElement jDElement = new JDLinExpr(1, 1, varArr[0].ScLinExprFactory);
+            for (int i = 0; i < varArr.Length; i++)
+            {
+                jDElement += (JDElement)varArr[i].Sum();
+            }
+            return jDElement.ToJDLinExpr();
+        }
+
+        /// <summary>
+        /// Sum of variables in argument array via elements. Equal size of variables is required.
+        /// </summary>
+        /// <param name="varArr">Array of variables to be sum.</param>
+        /// <returns>Result sum of variables in array. It has the same size as variables.</returns>
+        public JDLinExpr ElementSum(JDVar[] varArr)
+        {
+            JDElement jDElement = new JDLinExpr(varArr[0].XSize, varArr[0].YSize, varArr[0].ScLinExprFactory);
+            for (int i = 0; i < varArr.Length; i++)
+            {
+                jDElement += (JDElement)varArr[i];
+            }
+
+            return jDElement.ToJDLinExpr();
+        }
+
+        /// <summary>
+        /// Sum of variables in argument array via elements. Equal size of variables is required.
+        /// </summary>
+        /// <param name="variables">¨List of variables to be sum.</param>
+        /// <returns>Result sum of variables in array. It has the same size as variables.</returns>
+        public JDLinExpr ElementSum(IEnumerable<JDLinExpr> variables)
+        {
+            JDLinExpr[] array = variables.ToArray();
+            JDElement jDElement = new JDLinExpr(array[0].XSize, array[0].YSize, array[0].ScLinExprFactory);
+            for (int i = 0; i < array.Length; i++)
+            {
+                jDElement += (JDElement)array[i];
+            }
+
+            return jDElement.ToJDLinExpr();
+        }
+        #endregion
 
         #region << CONSTANT VARS CHECKING AND REPLACEING >>
 
@@ -1180,6 +1262,15 @@ namespace JDSpace
     /// </summary>
     public interface IJDSolver
     {
+        /// <summary>
+        /// Returns true if SOS1 constraints are supported by the solver.
+        /// </summary>
+        bool SupportsSOS1 { get; }
+
+        /// <summary>
+        /// Returns true if SOS2 constraints are supported by the solver.
+        /// </summary>
+        bool SupportsSOS2 { get; }
 
         /// <summary>
         /// Set logger object (callback).
@@ -1233,6 +1324,14 @@ namespace JDSpace
         /// </summary>
         /// <param name="contstrs">List of scalar constraints</param>
         void AddConstrs(List<ScConstr> contstrs);
+
+        /// <summary>
+        /// Export model to file
+        /// </summary>
+        /// <param name="filenameWithoutExtension">File name without extension</param>
+        /// <param name="fileType">File type (mps, lp)</param>
+        /// <returns>true if succeeded, false otherwise.</returns>
+        bool Export(string filenameWithoutExtension, string fileType);
     }
 
     /// <summary>
@@ -1374,12 +1473,13 @@ namespace JDSpace
         /// <param name="t">Solver that have solved model</param>
         /// <param name="jdMdl">Solved model</param>
         /// <returns>Test result</returns>
-        private static bool _tryGetResult(this IJDSolver t, JDModel jdMdl){
+        private static bool _tryGetResult(this IJDSolver t, JDModel jdMdl)
+        {
             if (jdMdl.ConVars.Count > 0)
             {
                 try
                 {
-                    t.GetVarValue(jdMdl.ConVars[0].Id);                    
+                    t.GetVarValue(jdMdl.ConVars[0].Id);
                 }
                 catch (Exception ex)
                 {
@@ -1503,6 +1603,89 @@ namespace JDSpace
             t.Log(_logFlag, JD.MSG_MODEL_SOLVING,
                 new Param(JD.PARAM_TIME,
                     (tModelSolving2 - tModelSolving1).TotalSeconds));
+        }
+        
+        /// <summary>
+        /// Export inserted JDModel as *.lp or *.mps file.
+        /// </summary>
+        /// <param name="solver">Solver used for export</param>
+        /// <param name="filenameWithoutExtension">File name without extension</param>
+        /// <param name="fileType">File type (mps, lp)</param>  
+        public static bool Export(this IJDSolver solver, JDModel model, string filenameWithoutExtension, string fileType)
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            DateTime now = DateTime.Now;
+            solver.Log(_logFlag, "Model exporting", model.ToParams().ToArray());
+            AddModelToSolver(solver, model);
+            bool result = WriteToFile(solver, model, filenameWithoutExtension, fileType);
+            solver.Reset();
+            DateTime now2 = DateTime.Now;
+            solver.Log(_logFlag, "Model exporting", new Param("time[s]", (now2 - now).TotalSeconds));
+            return result;
+        }
+
+        private static void AddModelToSolver(IJDSolver solver, JDModel model)
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            DateTime now = DateTime.Now;
+            solver.Log(_logFlag, "Putting model to solver");
+            AddVariablesToSolver(solver, model);
+            UpdateSolver(solver, model);
+            AddConstraintsToSolver(solver, model);
+            AddObjectiveToSolver(solver, model);
+            DateTime now2 = DateTime.Now;
+            solver.Log(_logFlag, "Putting model to solver", new Param("time[s]", (now2 - now).TotalSeconds), new Param("model", model.Name));
+        }
+
+        private static void AddVariablesToSolver(IJDSolver solver, JDModel model)
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            solver.Log(_logFlag, "Putting variables to solver");
+            stopwatch.Start();
+            solver.AddScVars(model.Vars);
+            stopwatch.Stop();
+            solver.Log(_logFlag, "Putting variables to solver", new Param("time[s]", stopwatch.Elapsed.TotalSeconds), new Param("model", model.Name));
+        }
+
+        private static void UpdateSolver(IJDSolver solver, JDModel model)
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            solver.Log(_logFlag, "Model updating");
+            stopwatch.Reset();
+            solver.Update();
+            stopwatch.Stop();
+            solver.Log(_logFlag, "Model updating", new Param("time[s]", stopwatch.Elapsed.TotalSeconds), new Param("model", model.Name));
+        }
+
+        private static void AddConstraintsToSolver(IJDSolver solver, JDModel model)
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            solver.Log(_logFlag, "Putting constraints to solver");
+            stopwatch.Restart();
+            solver.AddConstrs(model.Constrs);
+            solver.AddSOSConstrs(model.SOSConstraints);
+            stopwatch.Stop();
+            solver.Log(_logFlag, "Putting constraints to solver", new Param("time[s]", stopwatch.Elapsed.TotalSeconds), new Param("model", model.Name));
+        }
+
+        private static void AddObjectiveToSolver(IJDSolver solver, JDModel model)
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            solver.Log(_logFlag, "Putting obj. fun. to solver");
+            stopwatch.Restart();
+            solver.SetObjective(model.Obj, model.ObjSense);
+            stopwatch.Stop();
+            solver.Log(_logFlag, "Putting obj. fun. to solver", new Param("time[s]", stopwatch.Elapsed.TotalSeconds), new Param("model", model.Name));
+        }
+
+        private static bool WriteToFile(IJDSolver solver, JDModel model, string filename, string fileType)
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            solver.Log(_logFlag, "Writing to file");
+            stopwatch.Start();
+            bool result = solver.Export(filename, fileType);
+            solver.Log(_logFlag, "Writing to file", new Param("time[s]", stopwatch.Elapsed.TotalSeconds), new Param("model", model.Name));
+            return result;
         }
     }
 

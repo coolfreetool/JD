@@ -6,6 +6,7 @@ using JDSpace;
 using System.Diagnostics;
 using JDUtils;
 using LpSolveDotNet;
+using System.IO;
 
 namespace LpSolveJD
 {
@@ -17,7 +18,9 @@ namespace LpSolveJD
         public double[] Values;
         private LogFlags _logFlag = LogFlags.OPTIMIZER;
         private Logger _logger = null;
+        public bool SupportsSOS1 => true;
 
+        public bool SupportsSOS2 => true;
         public LpJDSolver()
         {
             LpSolve.Init();
@@ -27,7 +30,7 @@ namespace LpSolveJD
 
         void AddScVar(ScVar scVar)
         {
-            ColMap.Add(scVar.Id, _nextColId);            
+            ColMap.Add(scVar.Id, _nextColId);
             Lp.add_column(new double[Lp.get_Ncolumns() + 1]);
             Lp.set_lowbo(_nextColId, scVar.Lb);
             Lp.set_upbo(_nextColId, scVar.Ub);
@@ -47,7 +50,7 @@ namespace LpSolveJD
         }
 
         void IJDSolver.Reset()
-        {            
+        {
             Lp.delete_lp();
             Lp = LpSolve.make_lp(0, 0);
             _nextColId = 1;
@@ -60,7 +63,7 @@ namespace LpSolveJD
         }
 
         void AddConstr(ScConstr con)
-        {            
+        {
             int nVars = Lp.get_Ncolumns();
             double[] row = new double[nVars + 1];
             foreach (ScTerm term in con.Lhs.Terms)
@@ -102,7 +105,7 @@ namespace LpSolveJD
             {
                 varsIds[i] = ColMap[sosCon.Vars[i].Id];
             }
-            Lp.add_SOS("", sosCon.Type, prior, sosCon.Weights.Length, varsIds, sosCon.Weights); 
+            Lp.add_SOS("", sosCon.Type, prior, sosCon.Weights.Length, varsIds, sosCon.Weights);
         }
 
         Logger IJDSolver.GetLogger()
@@ -122,7 +125,7 @@ namespace LpSolveJD
                 _logger.Log(flags, message, parms);
             }
         }
-        
+
         private void _log(LogFlags flags, string message)
         {
             if (_logger != null)
@@ -160,16 +163,17 @@ namespace LpSolveJD
             ConfigureLpSolve(pars);
             Stopwatch sw = new Stopwatch();
             _log(_logFlag, "Problem solving");
-            sw.Start();            
+            sw.Start();
             lpsolve_return result = Lp.solve();
             sw.Stop();
             _log(_logFlag, String.Format("Solving finished: {0}, in {1} seconds.", result, sw.Elapsed.TotalSeconds));
             pars.Set(JD.StringParam.STATUS, result.ToString());
             pars.Set(JD.StringParam.SOLVER_NAME, "LP SOLVE");
             int jdResult = 0;
-            if((result == lpsolve_return.OPTIMAL) ||
+            if ((result == lpsolve_return.OPTIMAL) ||
                 (result == lpsolve_return.SUBOPTIMAL) ||
-                (result == lpsolve_return.PRESOLVED)){
+                (result == lpsolve_return.PRESOLVED))
+            {
                 jdResult = 1;
             }
             pars.Set(JD.IntParam.RESULT_STATUS, jdResult);
@@ -208,6 +212,35 @@ namespace LpSolveJD
                 {
                     Lp.set_verbose(lpsolve_verbosity.NEUTRAL);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Export model to file
+        /// </summary>
+        /// <param name="filenameWithoutExtension">File name without extension</param>
+        /// <param name="fileType">File type (mps, lp)</param>
+        /// <returns>true if succeeded, false otherwise.</returns>    
+        public bool Export(string filenameWithoutExtension, string fileType)
+        {
+            FileInfo fileInfo = new FileInfo($"{filenameWithoutExtension}.{fileType}");
+            if (fileInfo.Exists && fileInfo.IsReadOnly)
+            {
+                return false;
+            }
+            string text = null;
+            if (fileType == JD.LP)
+            {
+                return Lp.write_lp(fileInfo.FullName);
+            }
+            else
+            {
+                if (!(fileType == JD.MPS))
+                {
+                    throw new JDException("Unknown file type {0}", fileType);
+                }
+
+                return Lp.write_mps(fileInfo.FullName);
             }
         }
     }

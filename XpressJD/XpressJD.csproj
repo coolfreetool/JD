@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFrameworks>net5.0;net461</TargetFrameworks>
+    <TargetFrameworks>net5.0;net481</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\JD.NET\JD.NET.csproj">
@@ -12,11 +12,13 @@
       <Project>{9eb10088-c898-4ae2-9f08-f79107bb9a21}</Project>
       <Name>JDUtils</Name>
     </ProjectReference>
-    <Reference Include="xprb">
-      <HintPath>libs/xprb.dll</HintPath>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="xprbdn">
+      <HintPath>xprbdn.dll</HintPath>
     </Reference>
-    <Reference Include="xprs">
-      <HintPath>libs/xprs.dll</HintPath>
+    <Reference Include="xprsdn">
+      <HintPath>xprsdn.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>

@@ -1,15 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30114.105
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35222.181
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JDUtils", "JDUtils\JDUtils.csproj", "{95A9BB9D-24DB-4CB9-90F6-3EC8D722F14E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JDUtils", "JDUtils\JDUtils.csproj", "{95A9BB9D-24DB-4CB9-90F6-3EC8D722F14E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JD.NET", "JD.NET\JD.NET.csproj", "{B570FE5A-A17B-403B-BEE9-45A15ECF92CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JD.NET", "JD.NET\JD.NET.csproj", "{B570FE5A-A17B-403B-BEE9-45A15ECF92CD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JDTests", "JDTests\JDTests.csproj", "{55336BF3-2445-45D8-BB20-9FE34933D3F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JDTests", "JDTests\JDTests.csproj", "{55336BF3-2445-45D8-BB20-9FE34933D3F9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OTJD", "OTJD\OTJD.csproj", "{939E7B2B-33E8-47D3-BD04-986500E24B10}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OTJD", "OTJD\OTJD.csproj", "{939E7B2B-33E8-47D3-BD04-986500E24B10}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LpSolveJD", "LpSolveJD\LpSolveJD.csproj", "{2CC75AB9-DA14-458F-B88F-19AD5DD78E33}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,9 +21,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{95A9BB9D-24DB-4CB9-90F6-3EC8D722F14E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -72,5 +71,23 @@ Global
 		{939E7B2B-33E8-47D3-BD04-986500E24B10}.Release|x64.Build.0 = Release|Any CPU
 		{939E7B2B-33E8-47D3-BD04-986500E24B10}.Release|x86.ActiveCfg = Release|Any CPU
 		{939E7B2B-33E8-47D3-BD04-986500E24B10}.Release|x86.Build.0 = Release|Any CPU
+		{2CC75AB9-DA14-458F-B88F-19AD5DD78E33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2CC75AB9-DA14-458F-B88F-19AD5DD78E33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2CC75AB9-DA14-458F-B88F-19AD5DD78E33}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2CC75AB9-DA14-458F-B88F-19AD5DD78E33}.Debug|x64.Build.0 = Debug|Any CPU
+		{2CC75AB9-DA14-458F-B88F-19AD5DD78E33}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2CC75AB9-DA14-458F-B88F-19AD5DD78E33}.Debug|x86.Build.0 = Debug|Any CPU
+		{2CC75AB9-DA14-458F-B88F-19AD5DD78E33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2CC75AB9-DA14-458F-B88F-19AD5DD78E33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2CC75AB9-DA14-458F-B88F-19AD5DD78E33}.Release|x64.ActiveCfg = Release|Any CPU
+		{2CC75AB9-DA14-458F-B88F-19AD5DD78E33}.Release|x64.Build.0 = Release|Any CPU
+		{2CC75AB9-DA14-458F-B88F-19AD5DD78E33}.Release|x86.ActiveCfg = Release|Any CPU
+		{2CC75AB9-DA14-458F-B88F-19AD5DD78E33}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {147896F2-FAB4-4720-8C2C-05F4EE6A3513}
 	EndGlobalSection
 EndGlobal

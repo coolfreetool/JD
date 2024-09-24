@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <StartupObject>JDTests.Program</StartupObject>
-    <TargetFrameworks>net5.0;net461</TargetFrameworks>
+    <TargetFrameworks>net5.0;net481</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\JDUtils\JDUtils.csproj">
@@ -14,6 +14,7 @@
       <Project>{b570fe5a-a17b-403b-bee9-45a15ecf92cd}</Project>
       <Name>JD.NET</Name>
     </ProjectReference>
+    <ProjectReference Include="..\LpSolveJD\LpSolveJD.csproj" />
     <ProjectReference Include="..\OTJD\OTJD.csproj">
       <Project>{f6167682-33ad-470c-9240-9b54519343e9}</Project>
       <Name>OTJD</Name>

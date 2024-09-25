@@ -6,3 +6,4 @@ lib_x86
 *.db
 *.dll
 .idea
+models

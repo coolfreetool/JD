@@ -369,6 +369,12 @@ namespace JDSpace
             return pars;
         }
 
+        public void PrintParams() {
+            foreach (Param p in ToParams()) {
+                Console.WriteLine("{0}\t{1}", p.Name, p.Value);
+            }
+        }
+
         #region << MODEL COMPONENTS ADDING >>
         /// <summary>
         /// Adds a new variable to the model.

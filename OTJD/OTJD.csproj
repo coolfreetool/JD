@@ -13,6 +13,6 @@
       <Project>{9eb10088-c898-4ae2-9f08-f79107bb9a21}</Project>
       <Name>JDUtils</Name>
     </ProjectReference>
-    <PackageReference Include="Google.OrTools" Version="9.5.2237" />
+    <PackageReference Include="Google.OrTools" Version="9.11.4210" />
   </ItemGroup>
 </Project>

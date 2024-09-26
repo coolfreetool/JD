@@ -12,10 +12,10 @@ sudo apt-get install dotnet-sdk-5.0
 
 ## Run all tests
 ~~~bash
-SOLVER=CBC dotnet test -v n
+SOLVER=CBC dotnet test --framework net5.0 -v n
 ~~~
 
 ## Run a single test
 ~~~bash
-SOLVER=SCIP dotnet test --filter ExplicitSOS1and2Test2 -v n
+SOLVER=SCIP dotnet test --framework net5.0 --filter ExplicitSOS1and2Test2 -v n
 ~~~

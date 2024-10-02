@@ -270,44 +270,5 @@ namespace OTJD
             _solver.InterruptSolve();
         }
     }
-
-    public class GlpkJDSolver : OTJDSolver
-    {
-        internal override string name
-        {
-            get { return "GLPK"; }
-        }
-        public GlpkJDSolver()
-            : base("GLPK_MIXED_INTEGER_PROGRAMMING") { }
-    }
-
-    public class CbcJDSolver : OTJDSolver
-    {
-        internal override string name
-        {
-            get { return "CBC"; }
-        }
-        public CbcJDSolver()
-            : base("CBC_MIXED_INTEGER_PROGRAMMING") { }
-    }
-
-    public class ScipJDSolver : OTJDSolver
-    {
-        internal override string name
-        {
-            get { return "SCIP"; }
-        }
-        public ScipJDSolver()
-            : base("SCIP") { }
-    }
-    public class SatJDSolver : OTJDSolver
-    {
-        internal override string name
-        {
-            get { return "SAT"; }
-        }
-        public SatJDSolver()
-            : base("SAT") { }
-    }
 }
 

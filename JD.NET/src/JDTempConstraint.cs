@@ -9,75 +9,9 @@ using System.Collections;
 namespace JDSpace
 {
     /// <summary>
-    /// One JDTempConstraint site 
-    /// </summary>
-    public interface IJDComparable
-    {
-        int Numel { get; }
-        ScLinExpr GetScLinExpr(int i);
-    }
-
-    internal static class IJDComparableExtender
-    {
-        internal static ScLinExprFactory GetScFactory(this IJDComparable t)
-        {
-            if (t is JDConstant) return (t as JDConstant).ScLinExprFactory;
-            return (t as JDElement).ScLinExprFactory;
-        }
-    }
-
-    /// <summary>
-    /// Common right hand side constraint representation for (double, double[], double[,] and double[][]).
-    /// </summary>
-    internal abstract class JDConstant : IJDComparable
-    {
-        /// <summary>
-        /// Number of JDConstant elements
-        /// </summary>
-        public abstract int Numel { get; }
-        internal ScLinExprFactory ScLinExprFactory { get; set; }
-        internal ScLinExprFactory GetScLinExprFactory() { return ScLinExprFactory; }
-        public abstract object this[int i] { get; }
-        /// <summary>
-        /// Get ScLinExpr at position i
-        /// </summary>
-        /// <param name="i">Position of ScLinExpr</param>
-        /// <returns>Scalar linear epxpression</returns>
-        public ScLinExpr GetScLinExpr(int i)
-        {
-            return ScLinExprFactory.CreateScLinExpr(new List<ScTerm>(), this[i]);
-        }
-        internal JDConstant(ScLinExprFactory scFactory)
-        {
-            ScLinExprFactory = scFactory;
-        }
-    }
-
-    /// <summary>
-    /// Right hand side - double.
-    /// </summary>
-    internal class ObjectJDConstant : JDConstant
-    {
-        public override int Numel
-        {
-            get { return 1; }
-        }
-        public override object this[int i]
-        {
-            get { return _val; }
-        }
-        private object _val;
-        internal ObjectJDConstant(object val, ScLinExprFactory scFactory)
-            : base(scFactory)
-        {
-            _val = val;
-        }
-    }
-
-    /// <summary>
     /// Right hand side - double array.
     /// </summary>
-    internal class DoubleArrJDConstant : JDConstant
+    internal class DoubleArrJDConstant : JdConstant
     {
         public override int Numel
         {
@@ -98,7 +32,7 @@ namespace JDSpace
     /// <summary>
     /// Right hand side - 2D double array.
     /// </summary>
-    internal class DoubleArr2dJDConstant : JDConstant
+    internal class DoubleArr2dJDConstant : JdConstant
     {
         public override int Numel
         {
@@ -126,7 +60,7 @@ namespace JDSpace
     /// <summary>
     /// Right hand side - jagged array.
     /// </summary>
-    internal class DoubleArrJagRhs : JDConstant
+    internal class DoubleArrJagRhs : JdConstant
     {
         public override int Numel
         {
@@ -156,7 +90,7 @@ namespace JDSpace
     /// <summary>
     /// Right hand side - double.
     /// </summary>
-    internal class NamedConstantJDConstant : JDConstant
+    internal class NamedConstantJDConstant : JdConstant
     {
         public override int Numel
         {

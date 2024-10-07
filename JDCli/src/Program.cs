@@ -9,10 +9,6 @@ namespace JDCli
     {
         static void Main(string[] args)
         {
-            if (args.Length != 2) {
-                printHelp();
-                return;
-            }
             switch (args[0])
             {
                 case "show":
@@ -20,6 +16,9 @@ namespace JDCli
                     break;
                 case "solve":
                     solve(args[1]);
+                    break;
+                case "example1":
+                    example1();
                     break;
                 default:
                     printHelp();
@@ -31,6 +30,7 @@ namespace JDCli
             Console.WriteLine("Use two args: <command> <model>:");
             Console.WriteLine("1. show <model>");
             Console.WriteLine("2. solve <model>");
+            Console.WriteLine("3. example1 <model>");
         }
 
         static void show(string model) {
@@ -46,6 +46,28 @@ namespace JDCli
             IJDSolver solver = getSolverFromEnv();
             setSolverLogging(solver);
             solver.Solve(mdl);
+        }
+
+        static void example1() {
+            Console.WriteLine("Setting up solver");
+            IJDSolver solver = getSolverFromEnv();
+            setSolverLogging(solver);
+            JDModel mdl = new JDModel();
+            Console.WriteLine("Print model params:");
+            mdl.PrintParams();
+            // init var
+            JDVar x = mdl.AddVar(2, 3, -50, 50, JD.CONTINUOUS);
+            // constr.
+            double[,] C1 = { { 30, 30, 30 } };
+            double[,] C2 = { { 1, 2, 3 } };
+            JDLinExpr colSum = x.Sum(0);
+            mdl += (colSum == C1);
+            mdl += (x[1, 1, 0, 2] == C2);
+            // solve
+            mdl.SetObjective(x.Sum(), JD.MAXIMIZE);
+            solver.Solve(mdl);
+            Console.WriteLine("Evaluated matrix 'x':");
+            x.Print();
         }
 
         static void setSolverLogging(IJDSolver solver) {

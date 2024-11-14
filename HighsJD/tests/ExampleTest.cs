@@ -1,59 +1,12 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using NUnit.Framework;
-using JDSpace;
 using Highs;
-using System.Collections;
 
 namespace Tests
 {
     [TestFixture]
     internal class ExampleTest
     {
-        [Test]
-        public void PassLp1Test()
-        {      
-            double[] cc = {1, -2};
-            double[] cl = {0, 0};
-            double[] cu = {10, 10};
-            double[] rl = {0, 0};
-            double[] ru = {2, 1};
-            int[] astart = {0, 2};
-            int[] aindex = {0, 1, 0, 1};
-            double[] avalue = {1, 2, 1, 3};
-            HighsObjectiveSense sense = HighsObjectiveSense.kMinimize;
-            double offset = 0;
-            HighsMatrixFormat a_format = HighsMatrixFormat.kColwise;
-
-            HighsModel model = new HighsModel(cc, cl, cu, rl, ru, astart, aindex, avalue, null, offset, a_format, sense);
-
-            HighsLpSolver solver = new HighsLpSolver();
-
-            HighsStatus status = solver.passLp(model);
-            status = solver.run();
-            HighsSolution sol = solver.getSolution();
-            HighsBasis bas = solver.getBasis();
-            HighsModelStatus modelStatus = solver.GetModelStatus();
-            
-            Console.WriteLine("Status: " + status);
-            Console.WriteLine("Modelstatus: " + modelStatus);
-        
-            for (int i=0; i<sol.rowvalue.Length; i++) {
-                Console.WriteLine("Activity for row " + i + " = " + sol.rowvalue[i]);
-            }
-            for (int i=0; i<sol.coldual.Length; i++) {
-                Console.WriteLine("Reduced cost x[" + i + "] = " + sol.coldual[i]);
-            }
-            for (int i=0; i<sol.rowdual.Length; i++) {
-                Console.WriteLine("Dual value for row " + i + " = " + sol.rowdual[i]);
-            }
-            for (int i=0; i<sol.colvalue.Length; i++) {
-                Console.WriteLine("x" + i + " = " + sol.colvalue[i] + " is " + bas.colbasisstatus[i]);
-            }
-        }
-
         [Test]
         public void PassMip1Test()
         {      
@@ -79,13 +32,13 @@ namespace Tests
             HighsSolution sol = solver.getSolution();
             HighsBasis bas = solver.getBasis();
             HighsModelStatus modelStatus = solver.GetModelStatus();
-            
+
             Console.WriteLine("Status: " + status);
             Console.WriteLine("Modelstatus: " + modelStatus);
             Console.WriteLine("Optimization value: " + solver.getObjectiveValue());
-        
+
             for (int i=0; i<sol.rowvalue.Length; i++) {
-                Console.WriteLine("Activity for row " + i + " = " + sol.rowvalue[i]);
+                Console.WriteLine("Value x" + i + " = " + sol.rowvalue[i]);
             }
             for (int i=0; i<sol.coldual.Length; i++) {
                 Console.WriteLine("Reduced cost x[" + i + "] = " + sol.coldual[i]);
@@ -96,6 +49,45 @@ namespace Tests
             for (int i=0; i<sol.colvalue.Length; i++) {
                 Console.WriteLine("x" + i + " = " + sol.colvalue[i] + " is " + bas.colbasisstatus[i]);
             }
+            Assert.AreEqual(3, sol.colvalue[0], "x0 value");
+            Assert.AreEqual(2.2, sol.colvalue[1], "x1 value");
+        }
+
+
+        [Test]
+        public void PassMip2Test()
+        {
+            HighsLpSolver solver = new HighsLpSolver();
+
+            // Define x0 var
+            solver.addCol(1, 0, 100, new int[]{}, new double[]{});
+
+            // Define x1 var
+            solver.addCol(1, 0, 200, new int[]{}, new double[]{});
+            solver.changeColsIntegralityByRange(1, 1, new HighsIntegrality[]{HighsIntegrality.kInteger});
+
+            // Define x2 var
+            solver.addCol(1, 0, 300, new int[]{}, new double[]{});
+            solver.changeObjectiveSense(HighsObjectiveSense.kMaximize);
+
+            solver.addRow(double.NegativeInfinity, 115.9, new int[]{1}, new double[]{1});
+            solver.addRow(double.NegativeInfinity, 250.5, new int[]{2}, new double[]{1});
+            
+            HighsStatus status = solver.run();
+            HighsSolution sol = solver.getSolution();
+            HighsBasis bas = solver.getBasis();
+            HighsModelStatus modelStatus = solver.GetModelStatus();
+            
+            Console.WriteLine("Status: " + status);
+            Console.WriteLine("Modelstatus: " + modelStatus);
+            Console.WriteLine("Optimization value: " + solver.getObjectiveValue());
+        
+            for (int i=0; i<sol.colvalue.Length; i++) {
+                Console.WriteLine("x" + i + " = " + sol.colvalue[i] + " is " + bas.colbasisstatus[i]);
+            }
+            Assert.AreEqual(100, sol.colvalue[0], "x0 value");
+            Assert.AreEqual(115, sol.colvalue[1], "x1 value");
+            Assert.AreEqual(250.5, sol.colvalue[2], "x2 value");
         }
     }
 }

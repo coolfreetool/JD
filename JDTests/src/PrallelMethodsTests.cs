@@ -27,12 +27,7 @@ namespace JDSpace
         [Test]
         public void CreateVars()
         {
-            if (Environment.GetEnvironmentVariable("SOLVER") == "Highs") {
-                Assert.Ignore("Failing in Highs - TODO fix");
-            }
-            // pro mereni casu.
-            Stopwatch sw = new Stopwatch();            
-            
+            Stopwatch sw = new Stopwatch();
             JDModel mdl = new JDModel();
 
             int size = 800;

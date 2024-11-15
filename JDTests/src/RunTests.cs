@@ -8,6 +8,8 @@ using JDUtils;
 using NUnitLite;
 using OTJD;
 using LpSolveJD;
+using HighsJD;
+using NUnit.Framework;
 
 namespace JDSpace
 {
@@ -20,6 +22,8 @@ namespace JDSpace
         internal static IJDSolver _solver;
 
         public static void ResetSolver() {
+            string testName = TestContext.CurrentContext.Test.Name;
+            TestContext.WriteLine($"Running test: {testName}");
             string solverVar = Environment.GetEnvironmentVariable("SOLVER");
             switch (solverVar)
             {
@@ -37,6 +41,9 @@ namespace JDSpace
                     break;
                 case "LpSolve":
                     _solver = new LpJDSolver(); // not tested
+                    break;
+                case "Highs":
+                    _solver = new HighsJDSolver(); // not tested
                     break;
                 default:
                     throw new JDException("Unknown solver {0}", solverVar);

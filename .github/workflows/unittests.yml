@@ -17,9 +17,11 @@ jobs:
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
       # You can test your matrix by printing the current dotnet version
-      - name: Run tests (CBC)
+      - name: Run JDTests (CBC)
         run: SOLVER=CBC dotnet test --framework net5.0 -v m
-      - name: Run tests (SCIP)
+      - name: Run JDTests (SCIP)
         run: SOLVER=SCIP dotnet test --framework net5.0 -v m
-      - name: Run tests (HighsJD)
+      - name: Run JDTests (Highs)
+        run: SOLVER=Highs dotnet test --framework net5.0 -v m
+      - name: Run HighsJD project tests
         run: dotnet test --framework net5.0 -v m HighsJD/HighsJD.csproj

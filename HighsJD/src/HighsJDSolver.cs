@@ -16,7 +16,9 @@ namespace HighsJD {
         private Dictionary<int, int> _varsMap;
         private Logger _logger;
 
-        HighsLpSolver _highsSolver;
+        private HighsLpSolver _highsSolver;
+
+        private double offset;
 
         public HighsJDSolver() {
             _highsSolver = new HighsLpSolver();
@@ -133,6 +135,7 @@ namespace HighsJD {
             {
                 _highsSolver.changeColCost(_varsMap[term.Var.Id], term.Coeff);
             }
+            this.offset = obj.Constant;
             // _objective.SetOffset(obj.Constant);
 
             switch (sense)
@@ -154,13 +157,10 @@ namespace HighsJD {
             sw.Start();
             HighsStatus status = _highsSolver.run();
             sw.Stop();
-            HighsSolution sol = _highsSolver.getSolution();
-            HighsBasis bas = _highsSolver.getBasis();
             HighsModelStatus modelStatus = _highsSolver.GetModelStatus();
 
             Console.WriteLine("Status: " + status);
             Console.WriteLine("Model status: " + modelStatus);
-            Console.WriteLine("Optimization value: " + _highsSolver.getObjectiveValue());
             pars.Set(JD.StringParam.SOLVER_NAME, "Highs");
             int jdStatus = 0;
             if (modelStatus == HighsModelStatus.kOptimal) // optimal or suboptimal
@@ -172,7 +172,8 @@ namespace HighsJD {
             pars.Set(JD.DoubleParam.SOLVER_TIME, sw.Elapsed.TotalSeconds);
             if (pars.Get<int>(JD.IntParam.RESULT_STATUS) > 0)
             {
-                pars.Set(JD.DoubleParam.OBJ_VALUE, _highsSolver.getObjectiveValue());
+                double objValue = _highsSolver.getObjectiveValue() + offset;
+                pars.Set(JD.DoubleParam.OBJ_VALUE, objValue);
             }
         }
 

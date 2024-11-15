@@ -18,5 +18,6 @@
       <Project>{f6167682-33ad-470c-9240-9b54519343e9}</Project>
       <Name>OTJD</Name>
     </ProjectReference>
+    <ProjectReference Include="..\HighsJD\HighsJD.csproj" />
   </ItemGroup>
 </Project>

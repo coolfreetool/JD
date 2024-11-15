@@ -1,4 +1,5 @@
-﻿using JDSpace;
+﻿using HighsJD;
+using JDSpace;
 using JDUtils;
 using OTJD;
 using System;
@@ -88,6 +89,8 @@ namespace JDCli
                     return new GlpkJDSolver();
                 case "SAT":
                     return new SatJDSolver();
+                case "Highs":
+                    return new HighsJDSolver();
                 default:
                     Console.WriteLine("No solver specified (CBC, SCIP, Glpk, SAT), using default SCIP");
                     return new ScipJDSolver();

@@ -109,7 +109,8 @@ namespace HighsJD {
                     throw new JDException("Unknown sense: {0}", con.Sense);
             }
             if (rowCreateStatus == HighsStatus.kError) {
-                throw new JDException("Highs constraint (row) creation error for ScConstr {0}", con);
+                _logger.Log(new LogItem(DateTime.Now, String.Format("Highs constraint (row) creation error for ScConstr {0}", con), LogFlags.MODELER));
+                // throw new JDException("Highs constraint (row) creation error for ScConstr {0}", con);
             }
         }
 

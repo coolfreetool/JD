@@ -18,6 +18,8 @@ namespace HighsJD {
 
         private HighsLpSolver _highsSolver;
 
+        private double [] varValues;
+
         private double offset;
 
         public HighsJDSolver() {
@@ -167,6 +169,7 @@ namespace HighsJD {
             if (modelStatus == HighsModelStatus.kOptimal) // optimal or suboptimal
             {
                 jdStatus = 1;
+                varValues = _highsSolver.getSolution().colvalue;
             }
             pars.Set(JD.IntParam.RESULT_STATUS, jdStatus);
             pars.Set(JD.StringParam.STATUS, modelStatus.ToString());
@@ -180,7 +183,7 @@ namespace HighsJD {
 
         public double? GetVarValue(int id)
         {
-            return _highsSolver.getSolution().colvalue[_varsMap[id]];
+            return varValues[_varsMap[id]];
         }
 
         public bool Export(string filenameWithoutExtension, string fileType) {

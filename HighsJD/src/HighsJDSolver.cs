@@ -84,6 +84,7 @@ namespace HighsJD {
             double highsConstant = -con.Lhs.Constant;
             int[] indices = new int[con.Lhs.Terms.Count];
             double[] coeffs = new double[con.Lhs.Terms.Count];
+            // todo precalculate coeffs of the same var
             for (int i = 0; i < con.Lhs.Terms.Count; i++) {
                 ScTerm term = con.Lhs.Terms[i];
                 indices[i] = _varsMap[term.Var.Id];
@@ -111,7 +112,12 @@ namespace HighsJD {
                     throw new JDException("Unknown sense: {0}", con.Sense);
             }
             if (rowCreateStatus == HighsStatus.kError) {
-                _logger.Log(new LogItem(DateTime.Now, String.Format("Highs constraint (row) creation error for ScConstr {0}", con), LogFlags.MODELER));
+                string msg = String.Format("Highs constraint (row) creation error for ScConstr {0}", con);
+                if (_logger != null) {
+                    _logger.Log(new LogItem(DateTime.Now, msg, LogFlags.MODELER));
+                } else {
+                    Console.WriteLine(msg);
+                }
                 // throw new JDException("Highs constraint (row) creation error for ScConstr {0}", con);
             }
         }
@@ -166,7 +172,7 @@ namespace HighsJD {
             Console.WriteLine("Model status: " + modelStatus);
             pars.Set(JD.StringParam.SOLVER_NAME, "Highs");
             int jdStatus = 0;
-            if (modelStatus == HighsModelStatus.kOptimal) // optimal or suboptimal
+            if (status == HighsStatus.kOk) // optimal or suboptimal
             {
                 jdStatus = 1;
                 varValues = _highsSolver.getSolution().colvalue;

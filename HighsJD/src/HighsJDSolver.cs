@@ -79,6 +79,14 @@ namespace HighsJD {
             throw new NotImplementedException();
         }
 
+        private void addRow(double lower, double upper, int[] indices, double[] values, ScConstr constr) {
+            HighsStatus status = _highsSolver.addRow(lower, upper, indices, values);
+            if (status == HighsStatus.kError) {
+                string msg = string.Format("Highs constraint (row) creation error for ScConstr {0}", constr);
+                _logger?.Log(new LogItem(DateTime.Now, msg, LogFlags.MODELER));
+            }
+        }
+
         public void AddConstr(ScConstr con)
         {
             double highsConstant = -con.Lhs.Constant;
@@ -90,35 +98,25 @@ namespace HighsJD {
                 indices[i] = _varsMap[term.Var.Id];
                 coeffs[i] = term.Coeff;
             }
-            HighsStatus rowCreateStatus;
             switch(con.Sense)
             {
                 case JD.LESS_EQUAL:
                     // JD: lhs <= 0
                     // Highs: lhsTerms <= -lhsConstant
-                    rowCreateStatus = _highsSolver.addRow(double.NegativeInfinity, highsConstant, indices, coeffs);
+                    addRow(double.NegativeInfinity, highsConstant, indices, coeffs, con);
                     break;
                 case JD.GREATER_EQUAL:
                     // JD:  lhs => 0
                     // Highs: -lhsConstant <= lhsTerms
-                    rowCreateStatus = _highsSolver.addRow(highsConstant, double.NegativeInfinity, indices, coeffs);
+                    addRow(highsConstant, double.NegativeInfinity, indices, coeffs, con);
                     break;
                 case JD.EQUAL:
                     // JD:  0 <= lhs <= 0
                     // Highs: -lhsConstant <= lhsTerms <= -lhsConstant
-                    rowCreateStatus = _highsSolver.addRow(highsConstant, highsConstant, indices, coeffs);
+                    addRow(highsConstant, highsConstant, indices, coeffs, con);
                     break;
                 default:
                     throw new JDException("Unknown sense: {0}", con.Sense);
-            }
-            if (rowCreateStatus == HighsStatus.kError) {
-                string msg = String.Format("Highs constraint (row) creation error for ScConstr {0}", con);
-                if (_logger != null) {
-                    _logger.Log(new LogItem(DateTime.Now, msg, LogFlags.MODELER));
-                } else {
-                    Console.WriteLine(msg);
-                }
-                // throw new JDException("Highs constraint (row) creation error for ScConstr {0}", con);
             }
         }
 

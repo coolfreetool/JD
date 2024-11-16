@@ -24,6 +24,8 @@ namespace HighsJD {
 
         public HighsJDSolver() {
             _highsSolver = new HighsLpSolver();
+            _highsSolver.setStringOptionValue("log_file", "highs.log");
+            _highsSolver.setBoolOptionValue("log_to_console", 0);
             _varsMap = new Dictionary<int, int>();
         }
 

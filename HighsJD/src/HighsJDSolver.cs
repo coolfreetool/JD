@@ -29,7 +29,7 @@ namespace HighsJD {
 
         public void AddScVar(ScVar scVar) {
             double cost = 0;
-            var status = _highsSolver.addCol(cost, scVar.Lb, scVar.Ub, new int[]{}, new double[]{});
+            var status = _highsSolver.addCol(cost, scVar.Lb, scVar.Ub, Array.Empty<int>(), Array.Empty<double>());
             if (status == HighsStatus.kError) {
                 throw new JDException("Highs variable (column) creation error {0} for ScVar {1}", status, scVar);
             }
@@ -42,9 +42,6 @@ namespace HighsJD {
                     _highsSolver.changeColsIntegralityByRange(iCol, iCol, new HighsIntegrality[]{HighsIntegrality.kContinuous});
                     break;
                 case JD.BINARY:
-                    _highsSolver.changeColsIntegralityByRange(iCol, iCol, new HighsIntegrality[]{HighsIntegrality.kInteger});
-                    _highsSolver.changeColBounds(iCol, 0, 1);
-                    break;
                 case JD.INTEGER:
                     _highsSolver.changeColsIntegralityByRange(iCol, iCol, new HighsIntegrality[]{HighsIntegrality.kInteger});
                     break;

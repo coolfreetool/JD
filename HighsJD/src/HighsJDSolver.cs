@@ -18,9 +18,9 @@ namespace HighsJD {
 
         private HighsLpSolver _highsSolver;
 
-        private double [] varValues;
+        private double [] _varValues;
 
-        private double offset;
+        private double _offset;
 
         public HighsJDSolver() {
             _highsSolver = new HighsLpSolver();
@@ -50,12 +50,12 @@ namespace HighsJD {
             }
         }
 
-        public void SetLogger(JDUtils.Logger logger)
+        public void SetLogger(Logger logger)
         {
             _logger = logger;
         }
 
-        public JDUtils.Logger GetLogger()
+        public Logger GetLogger()
         {
             return _logger;
         }
@@ -67,10 +67,8 @@ namespace HighsJD {
 
         public void Reset()
         {
-            //_solver.Reset();
-            // _solver.Clear();
-            // _otVars.Clear();
-            throw new NotImplementedException();
+            _highsSolver.clearModel();
+            _highsSolver.clearSolver();
         }
 
         private void addRow(double lower, double upper, List<int> indices, List<double> values, ScConstr constr) {
@@ -141,7 +139,7 @@ namespace HighsJD {
             {
                 _highsSolver.changeColCost(_varsMap[term.Var.Id], term.Coeff);
             }
-            this.offset = obj.Constant;
+            this._offset = obj.Constant;
             // _objective.SetOffset(obj.Constant);
 
             switch (sense)
@@ -172,21 +170,21 @@ namespace HighsJD {
             if (status == HighsStatus.kOk) // optimal or suboptimal
             {
                 jdStatus = 1;
-                varValues = _highsSolver.getSolution().colvalue;
+                _varValues = _highsSolver.getSolution().colvalue;
             }
             pars.Set(JD.IntParam.RESULT_STATUS, jdStatus);
             pars.Set(JD.StringParam.STATUS, modelStatus.ToString());
             pars.Set(JD.DoubleParam.SOLVER_TIME, sw.Elapsed.TotalSeconds);
             if (pars.Get<int>(JD.IntParam.RESULT_STATUS) > 0)
             {
-                double objValue = _highsSolver.getObjectiveValue() + offset;
+                double objValue = _highsSolver.getObjectiveValue() + _offset;
                 pars.Set(JD.DoubleParam.OBJ_VALUE, objValue);
             }
         }
 
         public double? GetVarValue(int id)
         {
-            return varValues[_varsMap[id]];
+            return _varValues[_varsMap[id]];
         }
 
         public bool Export(string filenameWithoutExtension, string fileType) {

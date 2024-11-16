@@ -33,9 +33,6 @@ namespace HighsJD {
             if (status == HighsStatus.kError) {
                 throw new JDException("Highs variable (column) creation error {0} for ScVar {1}", status, scVar);
             }
-            //if (status == HighsStatus.kWarning) {
-            //  send warning to logger
-            //}
 
             int iCol = _highsSolver.getNumCol() - 1;
             _varsMap.Add(scVar.Id, iCol);
@@ -79,8 +76,8 @@ namespace HighsJD {
             throw new NotImplementedException();
         }
 
-        private void addRow(double lower, double upper, int[] indices, double[] values, ScConstr constr) {
-            HighsStatus status = _highsSolver.addRow(lower, upper, indices, values);
+        private void addRow(double lower, double upper, List<int> indices, List<double> values, ScConstr constr) {
+            HighsStatus status = _highsSolver.addRow(lower, upper, indices.ToArray(), values.ToArray());
             if (status == HighsStatus.kError) {
                 string msg = string.Format("Highs constraint (row) creation error for ScConstr {0}", constr);
                 _logger?.Log(new LogItem(DateTime.Now, msg, LogFlags.MODELER));
@@ -90,13 +87,18 @@ namespace HighsJD {
         public void AddConstr(ScConstr con)
         {
             double highsConstant = -con.Lhs.Constant;
-            int[] indices = new int[con.Lhs.Terms.Count];
-            double[] coeffs = new double[con.Lhs.Terms.Count];
-            // todo precalculate coeffs of the same var
-            for (int i = 0; i < con.Lhs.Terms.Count; i++) {
-                ScTerm term = con.Lhs.Terms[i];
-                indices[i] = _varsMap[term.Var.Id];
-                coeffs[i] = term.Coeff;
+            Dictionary<int, int> varId2index = new Dictionary<int, int>();
+            List<int> indices = new List<int>();
+            List<double> coeffs = new List<double>();
+            for (int iTerm = 0; iTerm < con.Lhs.Terms.Count; iTerm++) {
+                ScTerm term = con.Lhs.Terms[iTerm];
+                if (varId2index.ContainsKey(term.Var.Id)) {
+                    coeffs[varId2index[term.Var.Id]] += term.Coeff;
+                } else {
+                    varId2index.Add(term.Var.Id, indices.Count);
+                    indices.Add(_varsMap[term.Var.Id]);
+                    coeffs.Add(term.Coeff);
+                }
             }
             switch(con.Sense)
             {

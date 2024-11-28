@@ -121,7 +121,36 @@ namespace HighsJD {
 
         void IJDSolver.AddScVars(List<ScVar> vars)
         {
-            foreach (ScVar var in vars) AddScVar(var);
+            double[] lb = new double[vars.Count];
+            double[] ub = new double[vars.Count];
+            HighsIntegrality[] integrality = new HighsIntegrality[vars.Count];
+            int iCol = _highsSolver.getNumCol();
+            for(int i = 0; i < vars.Count; i++) {
+                lb[i] = vars[i].Lb;
+                ub[i] = vars[i].Ub;
+                _varsMap.Add(vars[i].Id, iCol + i);
+                switch (vars[i].Type)
+                {
+                    case JD.CONTINUOUS:
+                        integrality[i] = HighsIntegrality.kContinuous;
+                        break;
+                    case JD.BINARY:
+                    case JD.INTEGER:
+                        integrality[i] = HighsIntegrality.kInteger;
+                        break;
+                    default:
+                        throw new JDException("Unknown var type: {0}", vars[i].Type);
+                }
+            }
+            double[] cost = new double[vars.Count];
+            var status = _highsSolver.addCols(cost, lb, ub, Array.Empty<int>(), Array.Empty<int>(), Array.Empty<double>());
+            if (status == HighsStatus.kError) {
+                throw new JDException("Highs variables (columns) creation error {0} for ScVar {1}...{2}", status, vars[0], vars.Count);
+            }
+            status = _highsSolver.changeColsIntegralityByRange(iCol, iCol + vars.Count - 1, integrality);
+            if (status == HighsStatus.kError) {
+                throw new JDException("Highs variables (columns) integrality setting error {0} for ScVar {1}...{2}", status, vars[0], vars.Count);
+            }
         }
 
         void IJDSolver.AddConstrs(List<ScConstr> cons)

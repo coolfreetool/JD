@@ -47,8 +47,10 @@ namespace JDSpace
             Console.WriteLine("Obj creating {0} s", sw.Elapsed.TotalSeconds);
 
             mdl.SetObjective(obj, JD.MAXIMIZE);
+            Logger logger = new Logger();
+            logger.Register(new ConsolLogClient(), Logger.AllFlags);
+            JDTester._solver.SetLogger(logger);
             JDTester._solver.Solve(mdl);
-            //Console.ReadKey();
         }
     }
 }
